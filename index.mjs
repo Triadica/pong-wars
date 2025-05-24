@@ -13,6 +13,9 @@ const colorPalette = {
 const canvas = document.getElementById("pongCanvas");
 const ctx = canvas.getContext("2d");
 const scoreElement = document.getElementById("score");
+const weiScoreElement = document.getElementById("weiScore");
+const shuScoreElement = document.getElementById("shuScore");
+const wuScoreElement = document.getElementById("wuScore");
 
 const WEI_COLOR = "#8899DD"; // 魏国 - Blue background (relaxed tone)
 const WEI_BALL_COLOR = "#6677CC"; // 魏国 - Blue ball (relaxed tone)
@@ -164,11 +167,17 @@ function addRandomness(ball) {
     ball.dy = ball.dy > 0 ? MIN_SPEED : -MIN_SPEED;
 }
 
+function updateScoreDisplay() {
+  weiScoreElement.textContent = weiScore;
+  shuScoreElement.textContent = shuScore;
+  wuScoreElement.textContent = wuScore;
+}
+
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawSquares();
 
-  scoreElement.textContent = `Wei ${weiScore} | Shu ${shuScore} | Wu ${wuScore}`; // 三国分数显示
+  updateScoreDisplay();
 
   balls.forEach((ball) => {
     checkSquareCollision(ball);
@@ -185,4 +194,12 @@ function draw() {
 }
 
 const FRAME_RATE = 100;
-setInterval(draw, 1000 / FRAME_RATE);
+drawSquares();
+balls.forEach((ball) => {
+  drawBall(ball);
+});
+updateScoreDisplay(); // Initialize button scores
+
+setTimeout(() => {
+  setInterval(draw, 1000 / FRAME_RATE);
+}, 4000);

@@ -51,6 +51,40 @@
         font-size: 16px;
         padding-left: 20px;
         color: #172b36;
+        display: none; /* Hide the old score display */
+      }
+
+      #scoreButtons {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .score-button {
+        font-family: monospace;
+        font-size: 14px;
+        font-weight: bold;
+        color: white;
+        border: none;
+        border-radius: 0;
+        padding: 8px 20px;
+        cursor: default;
+        box-shadow: none;
+        min-width: 100px;
+      }
+
+      #weiButton {
+        background-color: #6677CC;
+      }
+
+      #shuButton {
+        background-color: #CC6666;
+      }
+
+      #wuButton {
+        background-color: #66CC66;
       }
 
       #made {
@@ -72,6 +106,11 @@
     <div id="container">
       <canvas id="pongCanvas" width="600" height="600"></canvas>
       <div id="score"></div>
+      <div id="scoreButtons">
+        <button id="weiButton" class="score-button">魏国 <span id="weiScore">0</span></button>
+        <button id="shuButton" class="score-button">蜀国 <span id="shuScore">0</span></button>
+        <button id="wuButton" class="score-button">吴国 <span id="wuScore">0</span></button>
+      </div>
       <p id="made">
         made by
         <a href="https://koenvangilst.nl/labs/pong-wars">Koen van Gilst</a> | source on
