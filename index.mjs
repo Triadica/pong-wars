@@ -24,7 +24,7 @@ const SHU_BALL_COLOR = "#CC6666"; // 蜀国 - Red ball (relaxed tone)
 const WU_COLOR = "#88DD88"; // 吴国 - Green background (relaxed tone)
 const WU_BALL_COLOR = "#66CC66"; // 吴国 - Green ball (relaxed tone)
 const SQUARE_SIZE = 16;
-const BASE_SPEED = 2; // 基础速度常量
+const MAX_SPEED = 20; // 最大速度常量
 
 const numSquaresX = canvas.width / SQUARE_SIZE;
 const numSquaresY = canvas.height / SQUARE_SIZE;
@@ -82,6 +82,18 @@ const balls = [
 ];
 
 let iteration = 0;
+// 贝塞尔曲线函数，用于计算速度比例
+function bezierSpeedCurve(t) {
+  // Using cubic-bezier(.11, .46, .5, -0.14)
+  return (
+    Math.pow(1 - t, 3) * 0 +
+    3 * Math.pow(1 - t, 2) * t * 0.11 +
+    3 * (1 - t) * Math.pow(t, 2) * 0.5 +
+    Math.pow(t, 3) * 1 +
+    3 * Math.pow(1 - t, 2) * t * 0.46 +
+    3 * (1 - t) * Math.pow(t, 2) * -0.14
+  );
+}
 
 function drawBall(ball) {
   ctx.beginPath();
@@ -181,12 +193,25 @@ function updateBallSpeed(ball) {
     territoryCount = wuScore;
   }
 
-  // 计算新的速度大小：基础速度 * ln(格子数)
-  // 为了避免ln(0)的问题，至少保证有1个格子
-  ball.speed = BASE_SPEED * Math.log(Math.max(territoryCount * 0.1, 1));
+  // 计算总格子数
+  const totalSquares = numSquaresX * numSquaresY;
 
-  // 添加轻微的随机性以保持游戏的动态性
-  ball.angle += Math.random() * 0.02 - 0.01;
+  // 计算领地比例 (0-1)
+  const territoryRatio = territoryCount / totalSquares;
+
+  // 使用贝塞尔曲线计算速度比例
+  const speedRatio = bezierSpeedCurve(territoryRatio);
+
+  // 计算最终速度: 最大速度 * 速度比例
+  ball.speed = MAX_SPEED * speedRatio;
+
+  // 扰动强度基于领地比例：领地越少，扰动越大
+  // 当领地比例为0时，扰动强度为0.05
+  // 当领地比例为1时，扰动强度为0.005
+  const perturbationStrength = 0.05 * (1 - territoryRatio) + 0.005;
+
+  // 添加基于领地比例的随机性扰动
+  ball.angle += perturbationStrength * (1 - 2 * Math.random());
 
   // 标准化角度到 [0, 2π) 范围
   ball.angle = ((ball.angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
@@ -227,7 +252,29 @@ function draw() {
   });
 
   iteration++;
-  if (iteration % 1_000 === 0) console.log("iteration", iteration, balls);
+  if (iteration % 1_000 === 0) {
+    console.log("iteration", iteration);
+    console.log("territories:", { wei: weiScore, shu: shuScore, wu: wuScore });
+    console.log(
+      "speeds:",
+      balls.map((ball) => {
+        const territoryCount =
+          ball.reverseColor === WEI_COLOR
+            ? weiScore
+            : ball.reverseColor === SHU_COLOR
+            ? shuScore
+            : wuScore;
+        const ratio = territoryCount / (numSquaresX * numSquaresY);
+        const perturbation = 0.05 * (1 - ratio) + 0.005;
+        return {
+          color: ball.reverseColor,
+          speed: ball.speed.toFixed(2),
+          ratio: ratio.toFixed(3),
+          perturbation: perturbation.toFixed(4),
+        };
+      })
+    );
+  }
 }
 
 const FRAME_RATE = 100;
