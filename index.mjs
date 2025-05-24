@@ -37,14 +37,18 @@ let wuScore = 0;
 const squares = [];
 
 // Populate the fields, 魏蜀吴 three kingdoms
+// Wei: top half, Shu: bottom left quarter, Wu: bottom right quarter
 for (let i = 0; i < numSquaresX; i++) {
   squares[i] = [];
   for (let j = 0; j < numSquaresY; j++) {
-    if (i < numSquaresX / 3) {
+    if (j < numSquaresY / 2) {
+      // Top half - Wei (魏国)
       squares[i][j] = WEI_COLOR;
-    } else if (i < (numSquaresX / 3) * 2) {
+    } else if (i < numSquaresX / 2) {
+      // Bottom left quarter - Shu (蜀国)
       squares[i][j] = SHU_COLOR;
     } else {
+      // Bottom right quarter - Wu (吴国)
       squares[i][j] = WU_COLOR;
     }
   }
@@ -52,27 +56,27 @@ for (let i = 0; i < numSquaresX; i++) {
 
 const balls = [
   {
-    x: canvas.width / 6, // 魏国球位置
-    y: canvas.height / 2,
+    x: canvas.width / 2, // 魏国球位置 - center of top area
+    y: canvas.height / 4, // Center of top half
     dx: 8,
-    dy: -8,
+    dy: 8, // Moving downward initially
     reverseColor: WEI_COLOR,
     ballColor: WEI_BALL_COLOR,
   },
   {
-    x: canvas.width / 2, // 蜀国球位置 (center)
-    y: canvas.height / 2,
-    dx: -8,
-    dy: 8,
+    x: canvas.width / 4, // 蜀国球位置 - center of bottom left quarter
+    y: (canvas.height / 4) * 3, // Center of bottom half
+    dx: 8,
+    dy: -8,
     reverseColor: SHU_COLOR,
     ballColor: SHU_BALL_COLOR,
   },
   {
     // 吴国球
-    x: (canvas.width / 6) * 5, // 吴国球位置
-    y: canvas.height / 2,
-    dx: 5, // Different initial speed for variety
-    dy: 5,
+    x: (canvas.width / 4) * 3, // 吴国球位置 - center of bottom right quarter
+    y: (canvas.height / 4) * 3, // Center of bottom half
+    dx: -5, // Different initial speed for variety
+    dy: -5,
     reverseColor: WU_COLOR,
     ballColor: WU_BALL_COLOR,
   },
