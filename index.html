@@ -56,34 +56,61 @@
 
       #scoreButtons {
         display: flex;
-        gap: 10px;
+        flex-direction: column;
+        gap: 8px;
         margin-top: 30px;
-        justify-content: center;
-        flex-wrap: wrap;
+        width: 100%;
+        max-width: 300px;
       }
 
-      .score-button {
+      .score-item {
+        display: flex;
+        align-items: center;
         font-family: monospace;
         font-size: 14px;
-        font-weight: bold;
-        color: white;
-        border: none;
-        border-radius: 0;
-        padding: 8px 20px;
-        cursor: default;
-        box-shadow: none;
-        min-width: 100px;
+        height: 24px;
       }
 
-      #weiButton {
+      .score-label {
+        min-width: 24px;
+        font-weight: bold;
+        color: #172b36;
+        text-align: left;
+      }
+
+      .score-bar-container {
+        flex: 1;
+        height: 18px;
+        background-color: #e0e0e0;
+        border-radius: 2px;
+        margin: 0 8px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .score-bar {
+        height: 100%;
+        border-radius: 2px;
+        transition: width 0.3s ease;
+        min-width: 2px;
+      }
+
+      .score-number {
+        min-width: 30px;
+        font-size: 11px;
+        color: #666;
+        text-align: right;
+      }
+
+      #weiBar {
         background-color: #6677CC;
       }
 
-      #shuButton {
+      #shuBar {
         background-color: #CC6666;
       }
 
-      #wuButton {
+      #wuBar {
         background-color: #66CC66;
       }
 
@@ -107,9 +134,27 @@
       <canvas id="pongCanvas" width="600" height="600"></canvas>
       <div id="score"></div>
       <div id="scoreButtons">
-        <button id="weiButton" class="score-button">魏国 <span id="weiScore">0</span></button>
-        <button id="shuButton" class="score-button">蜀国 <span id="shuScore">0</span></button>
-        <button id="wuButton" class="score-button">吴国 <span id="wuScore">0</span></button>
+        <div class="score-item">
+          <div class="score-label">魏</div>
+          <div class="score-bar-container">
+            <div id="weiBar" class="score-bar" style="width: 0%"></div>
+          </div>
+          <div class="score-number" id="weiScore">0</div>
+        </div>
+        <div class="score-item">
+          <div class="score-label">蜀</div>
+          <div class="score-bar-container">
+            <div id="shuBar" class="score-bar" style="width: 0%"></div>
+          </div>
+          <div class="score-number" id="shuScore">0</div>
+        </div>
+        <div class="score-item">
+          <div class="score-label">吴</div>
+          <div class="score-bar-container">
+            <div id="wuBar" class="score-bar" style="width: 0%"></div>
+          </div>
+          <div class="score-number" id="wuScore">0</div>
+        </div>
       </div>
       <p id="made">
         made by

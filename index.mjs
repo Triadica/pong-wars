@@ -175,6 +175,16 @@ function updateScoreDisplay() {
   weiScoreElement.textContent = weiScore;
   shuScoreElement.textContent = shuScore;
   wuScoreElement.textContent = wuScore;
+
+  // Update bar widths
+  const totalSquares = numSquaresX * numSquaresY;
+  const weiPercentage = (weiScore / totalSquares) * 100;
+  const shuPercentage = (shuScore / totalSquares) * 100;
+  const wuPercentage = (wuScore / totalSquares) * 100;
+
+  document.getElementById("weiBar").style.width = weiPercentage + "%";
+  document.getElementById("shuBar").style.width = shuPercentage + "%";
+  document.getElementById("wuBar").style.width = wuPercentage + "%";
 }
 
 function draw() {
