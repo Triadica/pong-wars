@@ -24,8 +24,7 @@ const SHU_BALL_COLOR = "#CC6666"; // 蜀国 - Red ball (relaxed tone)
 const WU_COLOR = "#88DD88"; // 吴国 - Green background (relaxed tone)
 const WU_BALL_COLOR = "#66CC66"; // 吴国 - Green ball (relaxed tone)
 const SQUARE_SIZE = 16;
-const MIN_SPEED = 5;
-const MAX_SPEED = 10;
+const BASE_SPEED = 2; // 基础速度常量
 
 const numSquaresX = canvas.width / SQUARE_SIZE;
 const numSquaresY = canvas.height / SQUARE_SIZE;
@@ -58,16 +57,16 @@ const balls = [
   {
     x: canvas.width / 2, // 魏国球位置 - center of top area
     y: canvas.height / 4, // Center of top half
-    dx: 8,
-    dy: 8, // Moving downward initially
+    speed: 3, // 速度绝对值
+    angle: Math.PI / 4, // 角度 (向右下移动)
     reverseColor: WEI_COLOR,
     ballColor: WEI_BALL_COLOR,
   },
   {
     x: canvas.width / 4, // 蜀国球位置 - center of bottom left quarter
     y: (canvas.height / 4) * 3, // Center of bottom half
-    dx: 8,
-    dy: -8,
+    speed: 3, // 速度绝对值
+    angle: -Math.PI / 4, // 角度 (向右上移动)
     reverseColor: SHU_COLOR,
     ballColor: SHU_BALL_COLOR,
   },
@@ -75,8 +74,8 @@ const balls = [
     // 吴国球
     x: (canvas.width / 4) * 3, // 吴国球位置 - center of bottom right quarter
     y: (canvas.height / 4) * 3, // Center of bottom half
-    dx: -5, // Different initial speed for variety
-    dy: -5,
+    speed: 3, // 速度绝对值
+    angle: (Math.PI * 5) / 4, // 角度 (向左上移动)
     reverseColor: WU_COLOR,
     ballColor: WU_BALL_COLOR,
   },
@@ -132,43 +131,65 @@ function checkSquareCollision(ball) {
 
         // Determine bounce direction based on the angle
         if (Math.abs(Math.cos(angle)) > Math.abs(Math.sin(angle))) {
-          ball.dx = -ball.dx;
+          // 水平碰撞，反转角度的水平分量
+          ball.angle = Math.PI - ball.angle;
         } else {
-          ball.dy = -ball.dy;
+          // 垂直碰撞，反转角度的垂直分量
+          ball.angle = -ball.angle;
         }
+
+        // 标准化角度到 [0, 2π) 范围
+        ball.angle =
+          ((ball.angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
       }
     }
   }
 }
 
 function checkBoundaryCollision(ball) {
+  // 计算当前的dx和dy用于边界检测
+  const dx = Math.cos(ball.angle) * ball.speed;
+  const dy = Math.sin(ball.angle) * ball.speed;
+
   if (
-    ball.x + ball.dx > canvas.width - SQUARE_SIZE / 2 ||
-    ball.x + ball.dx < SQUARE_SIZE / 2
+    ball.x + dx > canvas.width - SQUARE_SIZE / 2 ||
+    ball.x + dx < SQUARE_SIZE / 2
   ) {
-    ball.dx = -ball.dx;
+    // 水平边界碰撞，反转角度的水平分量
+    ball.angle = Math.PI - ball.angle;
   }
   if (
-    ball.y + ball.dy > canvas.height - SQUARE_SIZE / 2 ||
-    ball.y + ball.dy < SQUARE_SIZE / 2
+    ball.y + dy > canvas.height - SQUARE_SIZE / 2 ||
+    ball.y + dy < SQUARE_SIZE / 2
   ) {
-    ball.dy = -ball.dy;
+    // 垂直边界碰撞，反转角度的垂直分量
+    ball.angle = -ball.angle;
   }
+
+  // 标准化角度到 [0, 2π) 范围
+  ball.angle = ((ball.angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
 }
 
-function addRandomness(ball) {
-  ball.dx += Math.random() * 0.02 - 0.01;
-  ball.dy += Math.random() * 0.02 - 0.01;
+function updateBallSpeed(ball) {
+  // 计算当前球对应颜色的格子数量
+  let territoryCount = 0;
+  if (ball.reverseColor === WEI_COLOR) {
+    territoryCount = weiScore;
+  } else if (ball.reverseColor === SHU_COLOR) {
+    territoryCount = shuScore;
+  } else if (ball.reverseColor === WU_COLOR) {
+    territoryCount = wuScore;
+  }
 
-  // Limit the speed of the ball
-  ball.dx = Math.min(Math.max(ball.dx, -MAX_SPEED), MAX_SPEED);
-  ball.dy = Math.min(Math.max(ball.dy, -MAX_SPEED), MAX_SPEED);
+  // 计算新的速度大小：基础速度 * ln(格子数)
+  // 为了避免ln(0)的问题，至少保证有1个格子
+  ball.speed = BASE_SPEED * Math.log(Math.max(territoryCount * 0.1, 1));
 
-  // Make sure the ball always maintains a minimum speed
-  if (Math.abs(ball.dx) < MIN_SPEED)
-    ball.dx = ball.dx > 0 ? MIN_SPEED : -MIN_SPEED;
-  if (Math.abs(ball.dy) < MIN_SPEED)
-    ball.dy = ball.dy > 0 ? MIN_SPEED : -MIN_SPEED;
+  // 添加轻微的随机性以保持游戏的动态性
+  ball.angle += Math.random() * 0.02 - 0.01;
+
+  // 标准化角度到 [0, 2π) 范围
+  ball.angle = ((ball.angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
 }
 
 function updateScoreDisplay() {
@@ -197,14 +218,16 @@ function draw() {
     checkSquareCollision(ball);
     checkBoundaryCollision(ball);
     drawBall(ball);
-    ball.x += ball.dx;
-    ball.y += ball.dy;
 
-    addRandomness(ball);
+    // 根据速度和角度计算位移
+    ball.x += Math.cos(ball.angle) * ball.speed;
+    ball.y += Math.sin(ball.angle) * ball.speed;
+
+    updateBallSpeed(ball);
   });
 
   iteration++;
-  if (iteration % 1_000 === 0) console.log("iteration", iteration);
+  if (iteration % 1_000 === 0) console.log("iteration", iteration, balls);
 }
 
 const FRAME_RATE = 100;
@@ -216,4 +239,4 @@ updateScoreDisplay(); // Initialize button scores
 
 setTimeout(() => {
   setInterval(draw, 1000 / FRAME_RATE);
-}, 4000);
+}, 1000);
