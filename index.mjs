@@ -86,7 +86,7 @@ let iteration = 0;
 function bezierSpeedCurve(t) {
   const u = 1 - t;
   return (
-    u * u * u * 0 + 3 * u * u * t * 0.4 + 3 * u * t * t * 0.5 + t * t * t * 1
+    u * u * u * 0 + 3 * u * u * t * 0.44 + 3 * u * t * t * 0.5 + t * t * t * 1
   );
 }
 
