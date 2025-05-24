@@ -14,12 +14,12 @@ const canvas = document.getElementById("pongCanvas");
 const ctx = canvas.getContext("2d");
 const scoreElement = document.getElementById("score");
 
-const DAY_COLOR = colorPalette.MysticMint;
-const DAY_BALL_COLOR = colorPalette.NocturnalExpedition;
-const NIGHT_COLOR = colorPalette.NocturnalExpedition;
-const NIGHT_BALL_COLOR = colorPalette.MysticMint;
-const NEUTRAL_COLOR = colorPalette.Forsythia; // New color for the third section
-const NEUTRAL_BALL_COLOR = colorPalette.OceanicNoir; // New color for the third ball
+const DAY_COLOR = "#FF4444"; // Red background
+const DAY_BALL_COLOR = "#FF0000"; // Red ball
+const NIGHT_COLOR = "#00FF44"; // Yellow background
+const NIGHT_BALL_COLOR = "#00FF00"; // Yellow ball
+const NEUTRAL_COLOR = "#4444FF"; // Blue background
+const NEUTRAL_BALL_COLOR = "#0000FF"; // Blue ball
 const SQUARE_SIZE = 25;
 const MIN_SPEED = 5;
 const MAX_SPEED = 10;
@@ -83,6 +83,12 @@ function drawBall(ball) {
   ctx.arc(ball.x, ball.y, SQUARE_SIZE / 2, 0, Math.PI * 2, false);
   ctx.fillStyle = ball.ballColor;
   ctx.fill();
+
+  // Add white border
+  ctx.strokeStyle = "white";
+  ctx.lineWidth = 4;
+  ctx.stroke();
+
   ctx.closePath();
 }
 
@@ -166,9 +172,9 @@ function draw() {
   scoreElement.textContent = `day ${dayScore} | night ${nightScore} | neutral ${neutralScore}`; // Updated score display
 
   balls.forEach((ball) => {
-    drawBall(ball);
     checkSquareCollision(ball);
     checkBoundaryCollision(ball);
+    drawBall(ball);
     ball.x += ball.dx;
     ball.y += ball.dy;
 
