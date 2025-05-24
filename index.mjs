@@ -24,7 +24,7 @@ const SHU_BALL_COLOR = "#CC6666"; // 蜀国 - Red ball (relaxed tone)
 const WU_COLOR = "#88DD88"; // 吴国 - Green background (relaxed tone)
 const WU_BALL_COLOR = "#66CC66"; // 吴国 - Green ball (relaxed tone)
 const SQUARE_SIZE = 16;
-const MAX_SPEED = 20; // 最大速度常量
+const MAX_SPEED = 32; // 最大速度常量
 
 const numSquaresX = canvas.width / SQUARE_SIZE;
 const numSquaresY = canvas.height / SQUARE_SIZE;
@@ -84,14 +84,9 @@ const balls = [
 let iteration = 0;
 // 贝塞尔曲线函数，用于计算速度比例
 function bezierSpeedCurve(t) {
-  // Using cubic-bezier(.11, .46, .5, -0.14)
+  const u = 1 - t;
   return (
-    Math.pow(1 - t, 3) * 0 +
-    3 * Math.pow(1 - t, 2) * t * 0.11 +
-    3 * (1 - t) * Math.pow(t, 2) * 0.5 +
-    Math.pow(t, 3) * 1 +
-    3 * Math.pow(1 - t, 2) * t * 0.46 +
-    3 * (1 - t) * Math.pow(t, 2) * -0.14
+    u * u * u * 0 + 3 * u * u * t * 0.4 + 3 * u * t * t * 0.5 + t * t * t * 1
   );
 }
 
@@ -206,9 +201,7 @@ function updateBallSpeed(ball) {
   ball.speed = MAX_SPEED * speedRatio;
 
   // 扰动强度基于领地比例：领地越少，扰动越大
-  // 当领地比例为0时，扰动强度为0.05
-  // 当领地比例为1时，扰动强度为0.005
-  const perturbationStrength = 0.05 * (1 - territoryRatio) + 0.005;
+  const perturbationStrength = 0.2 * (1 - Math.sqrt(territoryRatio));
 
   // 添加基于领地比例的随机性扰动
   ball.angle += perturbationStrength * (1 - 2 * Math.random());
