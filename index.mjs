@@ -14,65 +14,64 @@ const canvas = document.getElementById("pongCanvas");
 const ctx = canvas.getContext("2d");
 const scoreElement = document.getElementById("score");
 
-const DAY_COLOR = "#FF4444"; // Red background
-const DAY_BALL_COLOR = "#FF0000"; // Red ball
-const NIGHT_COLOR = "#00FF44"; // Yellow background
-const NIGHT_BALL_COLOR = "#00FF00"; // Yellow ball
-const NEUTRAL_COLOR = "#4444FF"; // Blue background
-const NEUTRAL_BALL_COLOR = "#0000FF"; // Blue ball
-const SQUARE_SIZE = 25;
+const WEI_COLOR = "#8899DD"; // 魏国 - Blue background (relaxed tone)
+const WEI_BALL_COLOR = "#6677CC"; // 魏国 - Blue ball (relaxed tone)
+const SHU_COLOR = "#DD8888"; // 蜀国 - Red background (relaxed tone)
+const SHU_BALL_COLOR = "#CC6666"; // 蜀国 - Red ball (relaxed tone)
+const WU_COLOR = "#88DD88"; // 吴国 - Green background (relaxed tone)
+const WU_BALL_COLOR = "#66CC66"; // 吴国 - Green ball (relaxed tone)
+const SQUARE_SIZE = 16;
 const MIN_SPEED = 5;
 const MAX_SPEED = 10;
 
 const numSquaresX = canvas.width / SQUARE_SIZE;
 const numSquaresY = canvas.height / SQUARE_SIZE;
 
-let dayScore = 0;
-let nightScore = 0;
-let neutralScore = 0; // Added for the third color, though not displayed yet
+let weiScore = 0;
+let shuScore = 0;
+let wuScore = 0;
 
 const squares = [];
 
-// Populate the fields, one half day, one half night
+// Populate the fields, 魏蜀吴 three kingdoms
 for (let i = 0; i < numSquaresX; i++) {
   squares[i] = [];
   for (let j = 0; j < numSquaresY; j++) {
-    // squares[i][j] = i < numSquaresX / 2 ? DAY_COLOR : NIGHT_COLOR;
     if (i < numSquaresX / 3) {
-      squares[i][j] = DAY_COLOR;
+      squares[i][j] = WEI_COLOR;
     } else if (i < (numSquaresX / 3) * 2) {
-      squares[i][j] = NIGHT_COLOR;
+      squares[i][j] = SHU_COLOR;
     } else {
-      squares[i][j] = NEUTRAL_COLOR;
+      squares[i][j] = WU_COLOR;
     }
   }
 }
 
 const balls = [
   {
-    x: canvas.width / 6, // Adjusted for three sections
+    x: canvas.width / 6, // 魏国球位置
     y: canvas.height / 2,
     dx: 8,
     dy: -8,
-    reverseColor: DAY_COLOR,
-    ballColor: DAY_BALL_COLOR,
+    reverseColor: WEI_COLOR,
+    ballColor: WEI_BALL_COLOR,
   },
   {
-    x: canvas.width / 2, // Adjusted for three sections (center)
+    x: canvas.width / 2, // 蜀国球位置 (center)
     y: canvas.height / 2,
     dx: -8,
     dy: 8,
-    reverseColor: NIGHT_COLOR,
-    ballColor: NIGHT_BALL_COLOR,
+    reverseColor: SHU_COLOR,
+    ballColor: SHU_BALL_COLOR,
   },
   {
-    // New third ball
-    x: (canvas.width / 6) * 5, // Adjusted for three sections
+    // 吴国球
+    x: (canvas.width / 6) * 5, // 吴国球位置
     y: canvas.height / 2,
     dx: 5, // Different initial speed for variety
     dy: 5,
-    reverseColor: NEUTRAL_COLOR,
-    ballColor: NEUTRAL_BALL_COLOR,
+    reverseColor: WU_COLOR,
+    ballColor: WU_BALL_COLOR,
   },
 ];
 
@@ -86,16 +85,16 @@ function drawBall(ball) {
 
   // Add white border
   ctx.strokeStyle = "white";
-  ctx.lineWidth = 4;
+  ctx.lineWidth = 2;
   ctx.stroke();
 
   ctx.closePath();
 }
 
 function drawSquares() {
-  dayScore = 0;
-  nightScore = 0;
-  neutralScore = 0; // Reset neutral score
+  weiScore = 0;
+  shuScore = 0;
+  wuScore = 0; // Reset 吴国 score
 
   for (let i = 0; i < numSquaresX; i++) {
     for (let j = 0; j < numSquaresY; j++) {
@@ -103,9 +102,9 @@ function drawSquares() {
       ctx.fillRect(i * SQUARE_SIZE, j * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE);
 
       // Update scores
-      if (squares[i][j] === DAY_COLOR) dayScore++;
-      if (squares[i][j] === NIGHT_COLOR) nightScore++;
-      if (squares[i][j] === NEUTRAL_COLOR) neutralScore++; // Update neutral score
+      if (squares[i][j] === WEI_COLOR) weiScore++;
+      if (squares[i][j] === SHU_COLOR) shuScore++;
+      if (squares[i][j] === WU_COLOR) wuScore++; // Update 吴国 score
     }
   }
 }
@@ -169,7 +168,7 @@ function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawSquares();
 
-  scoreElement.textContent = `day ${dayScore} | night ${nightScore} | neutral ${neutralScore}`; // Updated score display
+  scoreElement.textContent = `Wei ${weiScore} | Shu ${shuScore} | Wu ${wuScore}`; // 三国分数显示
 
   balls.forEach((ball) => {
     checkSquareCollision(ball);
